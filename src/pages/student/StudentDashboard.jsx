@@ -1,22 +1,45 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 
 function StudentDashboard() {
-  const { user, logout } = useAuth()
+  const { userProfile, logout } = useAuth()
   const navigate = useNavigate()
 
-  function handleLogout() {
-    logout()
+  // 🔹 Sample data (for useMemo demo)
+  const meals = [
+    { name: "Breakfast", selected: true },
+    { name: "Lunch", selected: false },
+    { name: "Dinner", selected: true },
+  ]
+
+  // 🔹 useMemo optimization
+  const selectedMealsCount = useMemo(() => {
+    console.log("Calculating selected meals...")
+    return meals.filter(meal => meal.selected).length
+  }, [meals])
+
+  async function handleLogout() {
+    await logout()
     navigate('/login')
   }
 
   return (
     <div className="min-h-screen bg-slate-950 text-white px-6 py-10">
       <div className="max-w-6xl mx-auto">
+
+        {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-bold">Hello, {user?.name || 'User'} 👋</h1>
+            <h1 className="text-4xl font-bold">
+              Hello, {userProfile?.name || 'User'} 👋
+            </h1>
+
+            {/* 🔹 useMemo value displayed */}
+            <p className="text-green-400 mt-2">
+              Selected Meals: {selectedMealsCount}
+            </p>
+
             <p className="text-slate-400 mt-2">
               Welcome to your MessMate dashboard
             </p>
@@ -30,14 +53,16 @@ function StudentDashboard() {
           </button>
         </div>
 
+        {/* Features */}
         <div className="grid md:grid-cols-3 gap-6 mt-10">
+
           <Link
             to="/student/meal-intent"
             className="bg-slate-900 border border-slate-800 rounded-2xl p-6 hover:border-blue-500"
           >
             <h2 className="text-xl font-semibold">Meal Intent</h2>
             <p className="text-slate-400 mt-2">
-              Mark whether you are coming for breakfast, lunch, or dinner.
+              Mark whether you are coming for meals.
             </p>
           </Link>
 
@@ -60,7 +85,9 @@ function StudentDashboard() {
               Raise and track mess-related complaints.
             </p>
           </Link>
+
         </div>
+
       </div>
     </div>
   )
